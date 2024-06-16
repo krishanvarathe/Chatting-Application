@@ -8,19 +8,20 @@ import java.net.*;
 import java.io.*;
 
 
-public class Server implements ActionListener{
+
+public class Client implements ActionListener{
 
     JTextField text;
-    JPanel a1;
+    static JPanel a1;
     static Box vertical = Box.createVerticalBox();
+    
     static JFrame f = new JFrame();
+    
     static DataOutputStream dout;
 
-
-    Server(){
+    Client(){
 
         f.setLayout(null);
-
         JPanel p1 =new JPanel();
         p1.setBackground(new Color(135, 206, 235));
         p1.setBounds(0,0, 450, 70);
@@ -34,14 +35,14 @@ public class Server implements ActionListener{
         back.setBounds(5,15,40,40);
         p1.add(back);
 
+      
         back.addMouseListener(new MouseAdapter(){
             public void mouseClicked(MouseEvent ae){
                 System.exit(0);
                 
             }
         });
-
-        ImageIcon i4 = new ImageIcon(ClassLoader.getSystemResource("src/chatting/boy.png"));
+        ImageIcon i4 = new ImageIcon(ClassLoader.getSystemResource("src/chatting/girl.png"));
         Image i5 = i4.getImage().getScaledInstance(50,50, Image.SCALE_DEFAULT);
         ImageIcon i6=new ImageIcon(i5);
         JLabel profile = new JLabel(i6);
@@ -69,7 +70,7 @@ public class Server implements ActionListener{
         dot.setBounds(400,20,12,30);
         p1.add(dot);
 
-        JLabel name = new JLabel("BOY");
+        JLabel name = new JLabel("Girl");
         name.setForeground(Color.WHITE);
         name.setFont(new Font("SAN_SERIF",Font.BOLD,18));
         name.setBounds(110,15,100,18);
@@ -101,14 +102,14 @@ public class Server implements ActionListener{
 
 
         f.setSize(450,700);
-        f.setLocation(200,15);
+        f.setLocation(800,15);
         f.setUndecorated(true);
         f.getContentPane().setBackground(Color.white);
         f.setVisible(true);
     }
     public void actionPerformed(ActionEvent ae){
 
-        try{
+        try {
             String out  = text.getText();
             JPanel p2=formatLabel(out);
             
@@ -137,11 +138,12 @@ public class Server implements ActionListener{
 
     public static JPanel formatLabel(String out){
         JPanel panel = new JPanel();
+
 panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-JLabel output = new JLabel("<html><p style=\"width: 150px\">"+ out + "</html>");
+JLabel output = new JLabel("<html><p style=\"width : 150px\">"+out+ "</html>");
 
-output.setFont(new Font("Tahoma", Font.PLAIN, 16));
+output.setFont(new Font("Tahoma", Font.PLAIN,16));
 output.setBackground(new Color(37,211,102));
 output.setOpaque(true);
 output.setBorder(new EmptyBorder(15, 15, 15, 50));
@@ -153,7 +155,6 @@ panel.add(output);
 
         JLabel time =new JLabel();
         time.setText(sdf.format(cal.getTime()));
-        
         panel.add(time);
 
         return panel;
@@ -161,29 +162,36 @@ panel.add(output);
     }
 
     public static void main(String[] args) {
-        new Server();
+        new Client();
 
         try{
-            ServerSocket skt = new ServerSocket(6001);
-            while (true) {
-                Socket s = skt.accept();
-                DataInputStream din = new DataInputStream(s.getInputStream());
-                dout =new DataOutputStream(s.getOutputStream());
 
-                while(true) {
+            Socket s= new Socket("127.0.0.1", 6001);
 
-                    String msg = din.readUTF();
-                    JPanel panel = formatLabel(msg);
-                    
-                    JPanel left= new JPanel(new BorderLayout());
-                    left.add(panel, BorderLayout.LINE_START);
-                    vertical.add(left);
-                    f.validate();
-                }
-                
-            }
-        } catch (Exception e) {
+            DataInputStream din = new DataInputStream(s.getInputStream());
+            dout =new DataOutputStream(s.getOutputStream());
+
+            a1.setLayout(new BorderLayout());
+            String msg = din.readUTF();
+
+            JPanel panel = formatLabel(msg);
+            
+            JPanel left= new JPanel(new BorderLayout());
+
+            left.add(panel, BorderLayout.LINE_START);
+            vertical.add(left);
+
+            vertical.add(Box.createVerticalStrut(15));
+            a1.add(vertical, BorderLayout.PAGE_START);
+
+            f.validate();
+            
+
+            
+
+        }catch(Exception e){
             e.printStackTrace();
         }
+
     }
 }
